@@ -1,18 +1,17 @@
 ---
-title: "Iris Classifier - serving"
+title: "Machine learning model with API serving"
 linkTitle: "Machine learning serving"
 weight: 1
 type: "docs"
 ---
 
-A simple real-time machine learning service with REST API that is written in python and
+A simple machine learning model with API serving that is written in python and
 using [BentoML](https://github.com/bentoml/BentoML).
 
-
 This sample will walk you through the steps of creating and deploying a machine learning
-application using python. It will use BentoML to package and bundle an iris classifier
-model, use docker to build and push container image to docker hub, and then deploying
-your ML app to your Knative cluster.
+model using python. It will use BentoML to package a classifier model trained
+on the Iris dataset. Afterward we will create an API model server container image and
+deploy the image to Knative.
 
 ## Before you begin
 
