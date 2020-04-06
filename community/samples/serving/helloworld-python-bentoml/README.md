@@ -5,14 +5,14 @@ weight: 1
 type: "docs"
 ---
 
-A simple REST API machine learning application that is written in python and using [BentoML](https://github.com/bentoml/BentoML).
+A simple real-time machine learning service with REST API that is written in python and
+using [BentoML](https://github.com/bentoml/BentoML).
 
 
-This sample will walk you through the steps of training, creating and deploying an iris
-classifier using python. It will use BentoML to package and bundle the iris classifier
-model and then use docker to build and push container image to docker hub, and finally
-deploying your ML app to your Knative cluster.
-
+This sample will walk you through the steps of creating and deploying a machine learning
+application using python. It will use BentoML to package and bundle an iris classifier
+model, use docker to build and push container image to docker hub, and then deploying
+your ML app to your Knative cluster.
 
 ## Before you begin
 
@@ -25,12 +25,14 @@ deploying your ML app to your Knative cluster.
   - `scikit-learn` and `bentoml` packages, run command:
 
       ```shell
-      pip install scikit-learn bentoml
+      pip install scikit-learn
+      pip install bentoml
       ```
 
 ## Creating application
 
-1. Save the following code into file called `iris_classifier.py`:
+1. Save the following code into file called `iris_classifier.py`. It defines a machine
+  learning service spec with BentoML:
 
     ```python
     from bentoml import env, artifacts, api, BentoService
@@ -46,7 +48,8 @@ deploying your ML app to your Knative cluster.
             return self.artifacts.model.predict(df)
     ```
 
-2. Save the following  code into file called `helloworld_ml.py`:
+2. Save the following code into file called `helloworld_bentoml.py`. This code will train
+  an iris classifier model and then archive it with BentoML:
     ```python
     from sklearn import svm
     from sklearn import datasets
@@ -73,13 +76,14 @@ deploying your ML app to your Knative cluster.
         saved_path = iris_classifier_service.save()
     ```
 
-3. Run following command to build machine learing model and then bundle it with BentoML:
+3. Run following command to execute the file we wrote, it will trains iris
+  classifier model and then bundles it with BentoML:
+
     ```shell
-    python helloworld_ml.py
+    python helloworld_bentoml.py
     ```
 
-Now you have a packaged machine learning model that is ready for deloyment.
-
+Now you have a packaged machine learning model that is ready for deployment.
 
 ## Building application
 
@@ -90,6 +94,7 @@ Now you have a packaged machine learning model that is ready for deloyment.
     ```
 
     Example output:
+
     ```shell
     {
       "name": "IrisClassifier",
@@ -143,13 +148,12 @@ Now you have a packaged machine learning model that is ready for deloyment.
     ```
 
     Example:
+
     ```shell
     docker build -t yubozhao/iris-classifier /Users/bozhaoyu/bentoml/repository/IrisClassifier/20200305171229_0A1411
 
     docker push yubozhao/iris-classifier
     ```
-
-
 
 ## Deploying application
 
@@ -170,6 +174,7 @@ Now that your service is created, Knative performs the following steps:
   - Automatically scale your pods up and down (including to zero active
     pods).
 
+
 2. Run the following command to find the domain URL for your service:
 
   ```shell
@@ -177,6 +182,7 @@ Now that your service is created, Knative performs the following steps:
   ```
 
   Examplei ouput:
+
   ```shell
   NAME            URL
   iris-classifer   http://iris-classifer.default.example.com
@@ -196,10 +202,10 @@ Now that your service is created, Knative performs the following steps:
   ```
 
   Example output:
-  ```
+
+  ```shell
   [0]
   ```
-
 
 ## Removing deployment
 
