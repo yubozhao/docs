@@ -2,12 +2,12 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: iris-classifier 
-  namespace: bentoml
+  namespace: default
 spec:
   template:
     spec:
       containers:
-        - image: docker.io/yubozhao/iris-classifier
+        - image: docker.io/{username}/iris-classifier
           ports:
           - containerPort: 5000 # Port to route to
           livenessProbe:
