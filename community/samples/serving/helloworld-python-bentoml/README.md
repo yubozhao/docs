@@ -90,35 +90,7 @@ Additional Knative deployment guide with BentoML is also available in the
     python helloworld_bentoml.py
     ```
 
-### Test run API server
-
-BentoML can start an API server from the saved model. We will use BentoML CLI command to
-start an API server locally and test it with curl command.
-
-To start the API server use following command:
-
-  ```shell
-  bentoml serve IrisClassifier:latest
-  ```
-
-In another terminal window, we can make `curl` request with sample data to the API server
-and get prediction result:
-
-  ```shell
-  curl -v -i \
-  --header "Content-Type: application/json" \
-  --request POST \
-  --data '[[5.1, 3.5, 1.4, 0.2]]' \
-  127.0.0.1:5000/predict
-  ```
-
-## Building and deploying the sample
-
-BentoML auto generates a dockerfile for API server of the saved model.
-
-1. Use BentoML CLI to get saved model information. We will use the generated `Dockerfile`
-  in the saved model directory to build image. The directory path is displayed in the
-  `uri` section of the output JSON.
+4. We can use BentoML CLI to get saved model info.
 
     ```shell
     bentoml get IrisClassifier:latest
@@ -167,7 +139,33 @@ BentoML auto generates a dockerfile for API server of the saved model.
     }
     ```
 
-2. Use Docker to build API server into docker image and push with Docker hub. Run these
+### Test run API server
+
+BentoML can start an API server from the saved model. We will use BentoML CLI command to
+start an API server locally and test it with curl command.
+
+To start the API server use following command:
+
+  ```shell
+  bentoml serve IrisClassifier:latest
+  ```
+
+In another terminal window, we can make `curl` request with sample data to the API server
+and get prediction result:
+
+  ```shell
+  curl -v -i \
+  --header "Content-Type: application/json" \
+  --request POST \
+  --data '[[5.1, 3.5, 1.4, 0.2]]' \
+  127.0.0.1:5000/predict
+  ```
+
+## Building and deploying the sample
+
+BentoML auto generates a dockerfile for API server of the saved model.
+
+1. Use Docker to build API server into docker image and push with Docker hub. Run these
   commands replacing `{username}` with your Docker hub username.
 
     ```shell
@@ -188,7 +186,7 @@ BentoML auto generates a dockerfile for API server of the saved model.
     docker push yubozhao/iris-classifier
     ```
 
-3. After the build has completed the container is pushed to the docker
+2. After the build has completed the container is pushed to the docker
   hub, you can deploy the application into your cluster. Ensure that
   the container image value in `service.yaml` matches the container you
   built in the previous step. Apply the configuration use `kubectl`:
@@ -205,8 +203,7 @@ Now that your service is created, Knative performs the following steps:
   - Automatically scale your pods up and down (including to zero active
     pods).
 
-
-4. Run the following command to find the domain URL for your service:
+3. Run the following command to find the domain URL for your service:
 
   ```shell
   kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
@@ -221,7 +218,7 @@ Now that your service is created, Knative performs the following steps:
   iris-classifer   http://iris-classifer.default.example.com
   ```
 
-5. Now you can make a request to your app and see the result. Replace
+4. Now you can make a request to your app and see the result. Replace
   the URL below with the URL returned in the previous command.
 
   ```shell
