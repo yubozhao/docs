@@ -32,8 +32,10 @@ Knative deployment guide is also available on [BentoML documentation](https://do
 
 ## Recreating sample code
 
-1. Save the following code into file called `iris_classifier.py`. This file defines a
-  machine learning service spec with BentoML:
+1. Save the following code into file called `iris_classifier.py`. This code defines a
+  machine learning service that requires a scikit-learn model with BentoML. It asks
+  BentoML to figure out the required pip dependencies, also defined an API which is the
+  entry point for accessing this machine learning service:
 
     ```python
     from bentoml import env, artifacts, api, BentoService
@@ -79,8 +81,8 @@ Knative deployment guide is also available on [BentoML documentation](https://do
     ```
 
 3. Run following command to execute the file we wrote, it will trains the model and
-  save the model with its dependencies and configuration to a bundle on your local
-  disk with BentoML:
+  save the model with its dependencies and configuration in a versioned file archive on
+  your local disk with BentoML:
 
     ```shell
     python helloworld_bentoml.py
