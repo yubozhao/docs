@@ -13,7 +13,8 @@ model using python. It will use BentoML to package a classifier model trained
 on the Iris dataset. Afterward we will create an API model server container image and
 deploy the image to Knative.
 
-Knative deployment guide is also available on [BentoML documentation](https://docs.bentoml.org/en/latest/deployment/knative.html)
+Additional Knative deployment guide with BentoML is also available in the
+[BentoML documentation](https://docs.bentoml.org/en/latest/deployment/knative.html)
 
 ## Before you begin
 
@@ -51,8 +52,9 @@ Knative deployment guide is also available on [BentoML documentation](https://do
             return self.artifacts.model.predict(df)
     ```
 
-2. Save the following code into file called `helloworld_bentoml.py`. This code will train
-  a classifier model with iris dataset and then save it to local disk with BentoML:
+2. Save the following code into file called `helloworld_bentoml.py`. This code defines
+  how to train classifier model with iris dataset and how to save the model with
+  BentoML.
 
     ```python
     from sklearn import svm
@@ -166,13 +168,12 @@ BentoML auto generates a dockerfile for API server of the saved model.
     ```
 
 2. Use Docker to build API server into docker image and push with Docker hub. Run these
-  commands replacing `{username}` with your Docker hub username and replacing
-  `{saved_model_path}` with the directory path of saved model, you can find the value
-  from previous step's output.
+  commands replacing `{username}` with your Docker hub username.
 
     ```shell
+    saved_path=$(bentoml get IrisClassifier:latest -q | jq -r ".uri.uri")
     # Build the container on your local machine
-    docker build - t {username}/iris-classifier {saved_model_path}
+    docker build - t {username}/iris-classifier $saved_path
 
     # Push the container to docker registry
     docker push {username}/iris-classifier
@@ -181,7 +182,8 @@ BentoML auto generates a dockerfile for API server of the saved model.
     Example:
 
     ```shell
-    docker build -t yubozhao/iris-classifier /Users/bozhaoyu/bentoml/repository/IrisClassifier/20200305171229_0A1411
+    saved_path=$(bentoml get IrisClassifier:latest -q | jq -r ".uri.uri")
+    docker build -t yubozhao/iris-classifier $saved_path
 
     docker push yubozhao/iris-classifier
     ```
