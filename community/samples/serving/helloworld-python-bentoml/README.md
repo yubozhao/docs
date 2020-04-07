@@ -138,8 +138,8 @@ Knative deployment guide with BentoML is also available in the
     bentoml serve IrisClassifier:latest
     ```
 
-  In another terminal window, make `curl` request with sample data to the API server
-  and get prediction result:
+    In another terminal window, make `curl` request with sample data to the API server
+    and get prediction result:
 
     ```shell
     curl -v -i \
@@ -172,81 +172,81 @@ BentoML auto generates a dockerfile for API server of the saved model.
   Ensure the container image value matches the container you built in the previous step.
   Apply the configuration with `kubectl`:
 
-  ```yaml
-  apiVersion: serving.knative.dev/v1
-  kind: Service
-  metadata:
-    name: iris-classifier
-    namespace: default
-  spec:
-    template:
-      spec:
-        containers:
-          - image: docker.io/{username}/iris-classifier
-            ports:
-            - containerPort: 5000 # Port to route to
-            livenessProbe:
-              httpGet:
-                path: /healthz
-              initialDelaySeconds: 3
-              periodSeconds: 5
-            readinessProbe:
-              httpGet:
-                path: /healthz
-              initialDelaySeconds: 3
-              periodSeconds: 5
-              failureThreshold: 3
-              timeoutSeconds: 60
-  ```
+    ```yaml
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    metadata:
+      name: iris-classifier
+      namespace: default
+    spec:
+      template:
+        spec:
+          containers:
+            - image: docker.io/{username}/iris-classifier
+              ports:
+              - containerPort: 5000 # Port to route to
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                initialDelaySeconds: 3
+                periodSeconds: 5
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                initialDelaySeconds: 3
+                periodSeconds: 5
+                failureThreshold: 3
+                timeoutSeconds: 60
+    ```
 
-  ```shell
-  kubectl apply --filename service.yaml
-  ```
+    ```shell
+    kubectl apply --filename service.yaml
+    ```
 
-Now that your service is created, Knative performs the following steps:
+    Now that your service is created, Knative performs the following steps:
 
-  - Create a new immutable revision for this version of the app.
-  - Network programming to create a route, ingress, service, and load
-    balance for your application.
-  - Automatically scale your pods up and down (including to zero active
-    pods).
+      - Create a new immutable revision for this version of the app.
+      - Network programming to create a route, ingress, service, and load
+        balance for your application.
+      - Automatically scale your pods up and down (including to zero active
+        pods).
 
 3. Run the following command to find the domain URL for your service:
 
-  ```shell
-  kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
-  ```
+    ```shell
+    kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
+    ```
 
-  Example:
+    Example:
 
-  ```shell
-  > kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
+    ```shell
+    > kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
 
-  NAME            URL
-  iris-classifer   http://iris-classifer.default.example.com
-  ```
+    NAME            URL
+    iris-classifer   http://iris-classifer.default.example.com
+    ```
 
 4. Now you can request your app and see the result. Replace
   the URL below with the URL returned in the previous command.
 
-  ```shell
-  curl -v -i \
-    --header "Content-Type: application/json" \
-    --request POST \
-    --data '[[5.1, 3.5, 1.4, 0.2]]' \
-    http://iris-classifier.default.example.com/predict
-  ```
+    ```shell
+    curl -v -i \
+      --header "Content-Type: application/json" \
+      --request POST \
+      --data '[[5.1, 3.5, 1.4, 0.2]]' \
+      http://iris-classifier.default.example.com/predict
+    ```
 
-  Example:
+    Example:
 
-  ```shell
-  > curl -v -i \
-    --header "Content-Type: application/json" \
-    --request POST \
-    --data '[[5.1, 3.5, 1.4, 0.2]]' \
-    http://iris-classifier.default.example.com/predict
-  [0]
-  ```
+    ```shell
+    > curl -v -i \
+      --header "Content-Type: application/json" \
+      --request POST \
+      --data '[[5.1, 3.5, 1.4, 0.2]]' \
+      http://iris-classifier.default.example.com/predict
+    [0]
+    ```
 
 ## Removing the sample app deployment
 
