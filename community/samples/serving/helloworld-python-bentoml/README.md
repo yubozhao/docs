@@ -1,6 +1,6 @@
 ---
-title: "Machine learning model with API serving"
-linkTitle: "Machine learning serving"
+title: "Hello World - Python BentoML"
+linkTitle: "Python Bentoml"
 weight: 1
 type: "docs"
 ---
@@ -12,6 +12,8 @@ This sample will walk you through the steps of creating and deploying a machine 
 model using python. It will use BentoML to package a classifier model trained
 on the Iris dataset. Afterward we will create an API model server container image and
 deploy the image to Knative.
+
+Knative deployment guide is also available on [BentoML documentation](https://docs.bentoml.org/en/latest/deployment/knative.html)
 
 ## Before you begin
 
@@ -28,10 +30,10 @@ deploy the image to Knative.
       pip install bentoml
       ```
 
-## Creating application
+## Recreating sample code
 
-1. Save the following code into file called `iris_classifier.py`. It defines a machine
-  learning service spec with BentoML:
+1. Save the following code into file called `iris_classifier.py`. This file defines a
+  machine learning service spec with BentoML:
 
     ```python
     from bentoml import env, artifacts, api, BentoService
@@ -48,12 +50,13 @@ deploy the image to Knative.
     ```
 
 2. Save the following code into file called `helloworld_bentoml.py`. This code will train
-  an iris classifier model and then archive it with BentoML:
+  a classifier model with iris dataset and then save it to local disk with BentoML:
+
     ```python
     from sklearn import svm
     from sklearn import datasets
 
-    # import the class we create from previous step
+    # import the class from the file we created from previous step
     from iris_classifier import IrisCLassifier
 
     if __name__ == "__main__":
@@ -75,26 +78,52 @@ deploy the image to Knative.
         saved_path = iris_classifier_service.save()
     ```
 
-3. Run following command to execute the file we wrote, it will trains iris
-  classifier model and then bundles it with BentoML:
+3. Run following command to execute the file we wrote, it will trains the model and
+  save the model with its dependencies and configuration to a bundle on your local
+  disk with BentoML:
 
     ```shell
     python helloworld_bentoml.py
     ```
 
-Now you have a packaged machine learning model that is ready for deployment.
+### Test run API server
 
-## Building application
+BentoML can start an API server from the saved model. We will use BentoML CLI command to
+start an API server locally and test it with curl command.
 
-1. Use BentoML CLI to get packaged model information
+To start the API server use following command:
+
+  ```shell
+  bentoml serve IrisClassifier:latest
+  ```
+
+In another terminal window, we can make `curl` request with sample data to the API server
+and get prediction result:
+
+  ```shell
+  curl -v -i \
+  --header "Content-Type: application/json" \
+  --request POST \
+  --data '[[5.1, 3.5, 1.4, 0.2]]' \
+  127.0.0.1:5000/predict
+  ```
+
+## Building and deploying the sample
+
+BentoML auto generates a dockerfile for API server of the saved model.
+
+1. Use BentoML CLI to get saved model information. We will use the generated `Dockerfile`
+  in the saved model directory to build image. The directory path is displayed in the
+  `uri` section of the output JSON.
 
     ```shell
     bentoml get IrisClassifier:latest
     ```
 
-    Example output:
+    Example:
 
     ```shell
+    > bentoml get IrisClassifier:latest
     {
       "name": "IrisClassifier",
       "version": "20200305171229_0A1411",
@@ -134,13 +163,14 @@ Now you have a packaged machine learning model that is ready for deployment.
     }
     ```
 
-2. Use Docker to build the application into a container. To build and
-  push with Docker hub, run these commands replacing `{username}`
-  with your Docker hub username and replacing `{model path}` from the `uri.uri` section from the output above:
+2. Use Docker to build API server into docker image and push with Docker hub. Run these
+  commands replacing `{username}` with your Docker hub username and replacing
+  `{saved_model_path}` with the directory path of saved model, you can find the value
+  from previous step's output.
 
     ```shell
     # Build the container on your local machine
-    docker build - t {username}/iris-classifier {model_path}
+    docker build - t {username}/iris-classifier {saved_model_path}
 
     # Push the container to docker registry
     docker push {username}/iris-classifier
@@ -154,9 +184,7 @@ Now you have a packaged machine learning model that is ready for deployment.
     docker push yubozhao/iris-classifier
     ```
 
-## Deploying application
-
-1. After the build has completed the container is pushed to the docker
+3. After the build has completed the container is pushed to the docker
   hub, you can deploy the application into your cluster. Ensure that
   the container image value in `service.yaml` matches the container you
   built in the previous step. Apply the configuration use `kubectl`:
@@ -174,22 +202,22 @@ Now that your service is created, Knative performs the following steps:
     pods).
 
 
-2. Run the following command to find the domain URL for your service:
+4. Run the following command to find the domain URL for your service:
 
   ```shell
   kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
   ```
 
-  Examplei ouput:
+  Example:
 
   ```shell
+  > kubectl get ksvc iris-classifier --output=custom-columns=NAME:.metadata.name,URL:.status.url
+
   NAME            URL
   iris-classifer   http://iris-classifer.default.example.com
   ```
 
-## Making request to service
-
-1. Now you can make a request to your app and see the result. Replace
+5. Now you can make a request to your app and see the result. Replace
   the URL below with the URL returned in the previous command.
 
   ```shell
@@ -200,13 +228,18 @@ Now that your service is created, Knative performs the following steps:
     http://iris-classifier.default.example.com/predict
   ```
 
-  Example output:
+  Example:
 
   ```shell
+  > curl -v -i \
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '[[5.1, 3.5, 1.4, 0.2]]' \
+    http://iris-classifier.default.example.com/predict
   [0]
   ```
 
-## Removing deployment
+## Removing the sample app deployment
 
 To remove the application from your cluster, delete the service record:
 
