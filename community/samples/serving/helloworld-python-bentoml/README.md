@@ -6,7 +6,8 @@ type: "docs"
 ---
 
 A simple machine learning model with API serving that is written in python and
-using [BentoML](https://github.com/bentoml/BentoML).
+using [BentoML](https://github.com/bentoml/BentoML). BentoML is an open source
+framework for high performance ML model serving.
 
 This sample will walk you through the steps of creating and deploying a machine learning
 model using python. It will use BentoML to package a classifier model trained
